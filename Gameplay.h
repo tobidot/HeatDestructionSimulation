@@ -1,6 +1,7 @@
 #pragma once
 #include <inttypes.h>
 #include "olcPixelGameEngine.h"
+#include "AttributeTypes.h"
 
 
 namespace gameplay {
@@ -18,8 +19,8 @@ namespace gameplay {
 		MAX
 	};
 
-	uint16_t get_mass_of_block_type(BlockType type);
+	Mass get_mass_of_block_type(BlockType type);
 	olc::Pixel get_color_of_block_type(BlockType type);
 
-	
+
 };

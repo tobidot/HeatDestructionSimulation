@@ -15,12 +15,12 @@ namespace gameplay {
 		};
 	}
 
-	uint16_t get_mass_of_block_type(BlockType type) {
+	Mass get_mass_of_block_type(BlockType type) {
 		switch (type) {
 		case VACUUM:
 			return 0;
 		case DIRT:
-			return 5;
+			return 100;
 		case AIR:
 			return 1;
 		default:
