@@ -1,12 +1,62 @@
-Force Pressure -> Wanted Result
+## Simulation
 
-1 1 1   2 0 0		0 0 0
-1 1 1   0 1 0	-> 	2 0 0
-1 1 1   0 0 0		0 1 0
+### The World
+
+The world is stored as a simple grid of blocks,
+with a fixed width and height.
+
+And some constants define some of the worlds behaviour.
++ gravity : int
+
+### Blocks
+Every block has 4 attributes.
++ mass : int
++ pressure : int 
++ heat : int
++ type : enum
++ impuls  : vector
 
 
+#### Pressure
+The pressure value essentialy tells how many blocks are compressed into this one.
+If two neighbouring blocks merge together their pressure value adds up.
+A block always tries to minimize its pressure value as much as possible.
+This is achived by adding an impuls towards a block with a lower pressure.
 
 
+#### Mass
+The mass is a value defined by 
+> base_mass * pressure
+
+This mass acts upon a block simply multipling the gravity with its mass.
+> gravity_impuls = {0, mass * consts::gravity }
+
+#### Type
+Type defines some extra behaviours when beeig next to other blocks.
+Will be polished and defined later.
+
+#### Heat
+This attribute is the only thing the user can manipulate.
+Heat is trying to even out throughout the whole world.
+In one step the current heat is the median of all neighbouring and the current block.
+
+#### Impuls
+This value mostly determines wether something happens or not.
+If this value is bigger than a certain threshold,
+the blocks values will copy towards the targets block and the target block moves to this block.
+
+
+## Example
+
+##### Pressure Map
+
+| | | |
+|---|---|:-:|
+| 2m 1p (0,0)i | 1m 1p (0,0)i | 0m 0p (0,0)i |
+| 0m 0p (0,0)i | 0m 0p (0,0)i | 0m 0p (0,0)i |
+| 1m 1p (0,0)i | 0m 0p (0,0)i | 0m 0p (0,0)i |
+
+###### Thoughts
 
 World boundries
 
@@ -20,10 +70,17 @@ Mass
 ?x?
 nnn
 
-Pressure
-000
-?x?
----
+#### World boundries
+
+At the borders of the world some unchanging blocks are placed.
+Since the world is repeating in horizontal direction,
+they are only necessary above and below the world.
+
+| |
+|---|
+| 0m 0p (0,0)i | 
+| World | 
+| 1m 1p (0,0)i | 
 
 
 ### Step 1
