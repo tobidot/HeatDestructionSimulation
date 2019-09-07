@@ -1,10 +1,12 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <array>
 #include <vector>
 #include <algorithm>
 #include "olcPixelGameEngine.h"
 #include "Gameplay.h"
 #include "World.h"
+#include <math.h>
 
 using namespace gameplay;
 
@@ -72,7 +74,7 @@ public:
 
 	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block) {
 		if (this->GetKey(olc::Key::P).bHeld) {
-			uint8_t value = uint8_t(std::min(long(block.pressure), 255l));
+			uint8_t value = uint8_t(std::min(long(block.pressure * 16), 255l));
 			return olc::Pixel(value / 8, value / 8, value);
 		}
 		else if (this->GetKey(olc::Key::M).bHeld) {
@@ -84,8 +86,8 @@ public:
 			return olc::Pixel(value, value / 8, value / 8);
 		}
 		else if (this->GetKey(olc::Key::I).bHeld) {
-			uint8_t value_r = uint8_t(std::min(long(block.impuls.get_x()), 255l));
-			uint8_t value_b = uint8_t(std::min(long(block.impuls.get_y()), 255l));
+			uint8_t value_r = uint8_t(std::min(128+int16_t(127.0f*atanf(block.impuls.get_x()/10.0f) / M_PI), 255));
+			uint8_t value_b = uint8_t(std::min(128+ int16_t(127.0f*atanf(block.impuls.get_y()/100.0f) / M_PI), 255));
 			return olc::Pixel(value_r, 0, value_b);
 		}
 		return get_color_of_block_type(block.type);

@@ -8,7 +8,7 @@
 
 struct WorldBlock {
 	Position position = { 0,0 };
-	Position impuls = { 0,0 };
+	Impuls impuls = { 0,0 };
 	gameplay::BlockType type = gameplay::BlockType::HELL_STONE;
 	Pressure pressure = 1;
 	Mass mass = 1;
@@ -16,8 +16,19 @@ struct WorldBlock {
 
 
 public:
+	WorldBlock() {
+
+	}
+	WorldBlock(const Position& pos, const Impuls& impuls, gameplay::BlockType type, Pressure pressure, Heat heat) {
+		this->position = pos;
+		this->type = type;
+		this->pressure = pressure;
+		this->heat = heat;
+		this->impuls = impuls;
+		this->mass = get_mass_of_block_type(type);
+	}
 	WorldBlock get_update_result(const DirectNeighbours& neighbours) {
-		WorldBlock block = *this;		
+		WorldBlock block = *this;
 		block.heat = get_updated_heat(neighbours);
 		block.impuls = get_updated_impuls(neighbours);
 		return block;
@@ -31,23 +42,24 @@ public:
 		return position.get_y() < 0 || position.get_x() < 0;
 	}
 
+
 private:
-	WorldBlock(const Position& pos, const Impuls &impuls, gameplay::BlockType type, Pressure pressure, Heat heat) {
-		this->position = pos;
-		this->type = type;
-		this->pressure = pressure;
-		this->heat = heat;
-		this->impuls = impuls;
-		this->mass = get_mass_of_block_type(type);
-	}
 	Impuls get_updated_impuls(const DirectNeighbours& neighbours) const {
-		return { 0,0 };
+		const WorldBlock& block = *this;
+		auto effective_mass = block.pressure * block.mass;
+		auto gravity_impuls = Impuls(0.0f, effective_mass * gameplay::consts::GRAVITY);
+
+		auto horizontal_pressure_diff = neighbours.get_right().pressure - neighbours.get_left().pressure;
+		auto vertical_pressure_diff = neighbours.get_bottom().pressure - neighbours.get_top().pressure;
+		auto pressure_impuls = Impuls(horizontal_pressure_diff / 1.0f, vertical_pressure_diff / 1.0f);
+
+		return block.impuls +/* gravity_impuls +*/ pressure_impuls;
 	}
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
-		const WorldBlock &block = *this;
+		const WorldBlock& block = *this;
 		auto extract_heat_from_block = [](const WorldBlock* block) {return block->heat; };
 		auto heat_accumulator = [](Heat acc, const WorldBlock* block) {return acc + block->heat; };
-		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), 0, heat_accumulator);
+		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), Heat(0) , heat_accumulator);
 		auto medium_heat = (sum_heat + block.heat) / 5;
 		auto heat_diff = (atanf(medium_heat - block.heat) + 1.0f) / 2.0f;
 
@@ -58,16 +70,16 @@ private:
 
 public:
 	static WorldBlock create_block(const Position& pos, const Impuls& impulse, gameplay::BlockType type, Pressure pressure, Heat heat) {
-		return WorldBlock( pos, impulse, type, pressure, heat );
+		return WorldBlock(pos, impulse, type, pressure, heat);
 	}
 
 	static WorldBlock create_block_of_type(const Position& pos, gameplay::BlockType type) {
-		return WorldBlock::create_block(pos, { 0,0 }, type, 1, 10);
+		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, 1, 10);
 	}
 
 	static inline WorldBlock create_random_block(const Position& pos) {
 		gameplay::BlockType type = gameplay::BlockType(rand() % gameplay::BlockType::MAX);
-		return WorldBlock::create_block(pos, {0,0 }, type, rand() % 10, rand() % 100);
+		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, rand() % 10, Heat(rand() % 100));
 	}
 };
 

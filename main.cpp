@@ -1,4 +1,5 @@
 #define OLC_PGE_APPLICATION
+#define _USE_MATH_DEFINES
 #include "GameEngine.h"
 
 int main(char** args, int argc) {
