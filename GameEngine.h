@@ -58,14 +58,33 @@ public:
 		for (auto world_block : world) {
 			auto x = world_block.position.get_x();
 			auto y = world_block.position.get_y();
-			auto color = get_color_of_block_type(world_block.type);
+			olc::Pixel color = this->get_pixel_for_block_in_render_mode(world_block);
 			Draw(x, y, color);
 		}
 
 
-		DrawSprite(5, 5, human_stand, 2);
+		//DrawSprite(5, 5, human_stand, 2);
 
 		return true;
+
 	}
+
+	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block)  {
+		if (this->GetKey(olc::Key::P).bHeld) {
+			uint8_t value = uint8_t(block.pressure);
+			return olc::Pixel(value, value, value);
+		}
+		else if (this->GetKey(olc::Key::M).bHeld) {
+			uint8_t value = uint8_t(block.pressure);
+			return olc::Pixel(value, value, value);
+		}
+		else if (this->GetKey(olc::Key::V).bHeld) {
+			uint8_t value_r = uint8_t(block.position.get_x());
+			uint8_t value_b = uint8_t(block.position.get_y());
+			return olc::Pixel(value_r, 0, value_b);
+		}
+		return get_color_of_block_type(block.type);
+	}
+
 };
 
