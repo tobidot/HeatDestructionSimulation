@@ -32,6 +32,14 @@ public:
 	}
 
 private:
+	WorldBlock(const Position& pos, const Impuls &impuls, gameplay::BlockType type, Pressure pressure, Heat heat) {
+		this->position = pos;
+		this->type = type;
+		this->pressure = pressure;
+		this->heat = heat;
+		this->impuls = impuls;
+		this->mass = get_mass_of_block_type(type);
+	}
 	Impuls get_updated_impuls(const DirectNeighbours& neighbours) const {
 		return { 0,0 };
 	}
@@ -49,17 +57,17 @@ private:
 	}
 
 public:
-	static WorldBlock create_block(const Position& pos, gameplay::BlockType type, Pressure pressure, Heat heat) {
-		return WorldBlock({ pos, type, pressure, gameplay::get_mass_of_block_type(type), heat });
+	static WorldBlock create_block(const Position& pos, const Impuls& impulse, gameplay::BlockType type, Pressure pressure, Heat heat) {
+		return WorldBlock( pos, impulse, type, pressure, heat );
 	}
 
 	static WorldBlock create_block_of_type(const Position& pos, gameplay::BlockType type) {
-		return WorldBlock::create_block(pos, type, 1, 10);
+		return WorldBlock::create_block(pos, { 0,0 }, type, 1, 10);
 	}
 
 	static inline WorldBlock create_random_block(const Position& pos) {
 		gameplay::BlockType type = gameplay::BlockType(rand() % gameplay::BlockType::MAX);
-		return WorldBlock::create_block(pos, type, rand() % 10, rand() % 100);
+		return WorldBlock::create_block(pos, {0,0 }, type, rand() % 10, rand() % 100);
 	}
 };
 
