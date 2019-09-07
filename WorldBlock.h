@@ -1,6 +1,7 @@
 #pragma once
 #include <inttypes.h>
 #include <functional>
+#include <algorithm>
 #include <numeric>
 #include "Gameplay.h"
 #include "AttributeTypes.h"
@@ -53,13 +54,19 @@ private:
 		auto vertical_pressure_diff = neighbours.get_bottom().pressure - neighbours.get_top().pressure;
 		auto pressure_impuls = Impuls(horizontal_pressure_diff / 1.0f, vertical_pressure_diff / 1.0f);
 
-		return block.impuls + gravity_impuls + pressure_impuls;
+		auto impuls_from_top = std::max(neighbours.get_top().impuls.get_y(), 0.0f) / 10.f;
+		auto impuls_from_bottom = std::min(neighbours.get_bottom().impuls.get_y(), 0.0f) / 10.f;
+		auto impuls_from_left = std::max(neighbours.get_left().impuls.get_x(), 0.0f) / 10.f;
+		auto impuls_from_right = std::min(neighbours.get_right().impuls.get_x(), 0.0f) / 10.f;
+		auto neighbour_impuls = Impuls(impuls_from_top + impuls_from_bottom, impuls_from_left + impuls_from_right);
+
+		return block.impuls + gravity_impuls + pressure_impuls + neighbour_impuls;
 	}
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
 		auto extract_heat_from_block = [](const WorldBlock* block) {return block->heat; };
 		auto heat_accumulator = [](Heat acc, const WorldBlock* block) {return acc + block->heat; };
-		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), Heat(0) , heat_accumulator);
+		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), Heat(0), heat_accumulator);
 		auto medium_heat = (sum_heat + block.heat) / 5;
 		auto heat_diff = (atanf(medium_heat - block.heat) + 1.0f) / 2.0f;
 

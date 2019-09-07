@@ -21,16 +21,19 @@ public:
 	const SELF top(T amount = 1) const { return SELF(get_x(), get_y() - amount); }
 	const SELF bottom(T amount = 1) const { return SELF(get_x(), get_y() + amount); }
 
+	template<typename R = T>
+	R get_length2() const { return get_x() * get_x() + get_y() * get_y(); }
+	template<typename R = T>
+	R get_length() const { return sqrt(get_length2()); }
+	template<typename R = T>
+	MyVector<R> get_normalized() const { auto length = get_length(); return MyVector<R>(get_x() / length, get_y() / length); }
 public:
 	SELF& operator=(const SELF& other) { return set_x(other.get_x()).set_y(other.get_y()); }
 	SELF operator+(const SELF& other) const { return SELF(get_x() + other.get_x(), get_y() + other.get_y()); }
 	SELF operator-(const SELF& other) const { return SELF(get_x() - other.get_x(), get_y() - other.get_y()); }
 	SELF operator*(const T mul) const { return SELF(get_x() * mul, get_y() * mul); }
 	SELF operator/(const T div) const { return SELF(get_x() / div, get_y() / div); }
-	template<typename R = T>
-	R length2() const { return get_x() * get_x() + get_y() * get_y(); }
-	template<typename R = T>
-	R length() const { return sqrt(length2()); }
+
 };
 
 using Impuls = MyVector<float>;
