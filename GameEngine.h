@@ -16,7 +16,7 @@ private:
 	float game_time;
 	float time_to_next_update;
 	olc::Sprite* human_stand;
-	World world = World(64u, 64u);
+	World world = World(50u, 50u);
 
 public:
 	GameEngine()
