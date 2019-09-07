@@ -53,7 +53,7 @@ private:
 		auto vertical_pressure_diff = neighbours.get_bottom().pressure - neighbours.get_top().pressure;
 		auto pressure_impuls = Impuls(horizontal_pressure_diff / 1.0f, vertical_pressure_diff / 1.0f);
 
-		return block.impuls +/* gravity_impuls +*/ pressure_impuls;
+		return block.impuls + gravity_impuls + pressure_impuls;
 	}
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
