@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <algorithm>
 #include "olcPixelGameEngine.h"
 #include "Gameplay.h"
 #include "World.h"
@@ -69,18 +70,22 @@ public:
 
 	}
 
-	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block)  {
+	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block) {
 		if (this->GetKey(olc::Key::P).bHeld) {
-			uint8_t value = uint8_t(block.pressure);
-			return olc::Pixel(value, value, value);
+			uint8_t value = uint8_t(std::min(long(block.pressure), 255l));
+			return olc::Pixel(value / 8, value / 8, value);
 		}
 		else if (this->GetKey(olc::Key::M).bHeld) {
-			uint8_t value = uint8_t(block.pressure);
-			return olc::Pixel(value, value, value);
+			uint8_t value = uint8_t(std::min(long(block.mass), 255l));
+			return olc::Pixel(value / 8, value, value / 8);
 		}
-		else if (this->GetKey(olc::Key::V).bHeld) {
-			uint8_t value_r = uint8_t(block.position.get_x());
-			uint8_t value_b = uint8_t(block.position.get_y());
+		else if (this->GetKey(olc::Key::H).bHeld) {
+			uint8_t value = uint8_t(std::min(long(block.heat), 255l));
+			return olc::Pixel(value, value / 8, value / 8);
+		}
+		else if (this->GetKey(olc::Key::I).bHeld) {
+			uint8_t value_r = uint8_t(std::min(long(block.impuls.get_x()), 255l));
+			uint8_t value_b = uint8_t(std::min(long(block.impuls.get_y()), 255l));
 			return olc::Pixel(value_r, 0, value_b);
 		}
 		return get_color_of_block_type(block.type);
