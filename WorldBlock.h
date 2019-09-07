@@ -29,7 +29,7 @@ public:
 	}
 
 	static inline WorldBlock create_random_block(int16_t x, int16_t y) {
-		gameplay::BlockType type = gameplay::BlockType(rand() * gameplay::BlockType::MAX);
+		gameplay::BlockType type = gameplay::BlockType(rand() % gameplay::BlockType::MAX);
 		return WorldBlock::create_block_of_type(x, y, type);
 	}
 };
