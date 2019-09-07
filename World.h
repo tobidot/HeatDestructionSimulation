@@ -8,15 +8,15 @@
 
 class World {
 public:
-	using BLOCK_CONSTRUCTOR = std::function<WorldBlock(uint16_t x, uint16_t y)>;
+	using BLOCK_CONSTRUCTOR = std::function<WorldBlock(const Position &pos)>;
 public:
 	const uint16_t WIDTH;
 	const uint16_t HEIGHT;
 protected:
 	std::vector<WorldBlock> blocks;
 private:
-	WorldBlock block_above_world_top = WorldBlock::create_block_of_type(0,-1,gameplay::BlockType::HEAVEN_STONE);
-	WorldBlock block_below_world_bottom = WorldBlock::create_block_of_type(0,HEIGHT, gameplay::BlockType::HELL_STONE);
+	WorldBlock block_above_world_top = WorldBlock::create_block({ 0,-1 }, gameplay::BlockType::HEAVEN_STONE, 0, 0);
+	WorldBlock block_below_world_bottom = WorldBlock::create_block({ 0,HEIGHT }, gameplay::BlockType::HELL_STONE, 10, 100000.0f);
 
 public:
 	World(const World& cpy) :
@@ -51,7 +51,7 @@ public:
 		for (size_t i = 0; i < blocks_size; ++i) {
 			int16_t x = int16_t( i % WIDTH );
 			int16_t y = int16_t( i / HEIGHT );
-			blocks.at(i) = block_constructor(x, y);
+			blocks.at(i) = block_constructor({ x, y });
 		}
 		return *this;
 	}
@@ -79,7 +79,7 @@ public:
 		const World& current = *this;
 		World result = World(WIDTH, HEIGHT);
 		for (auto block : current.blocks) {
-			auto result_block = block.get_resulting_impuls(neighbours_at(block.position));
+			auto result_block = block.get_update_result(neighbours_at(block.position));
 			result.at(block.position) = result_block;
 		}
 		return result;
