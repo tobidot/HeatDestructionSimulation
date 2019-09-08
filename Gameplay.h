@@ -8,8 +8,8 @@ namespace gameplay {
 
 	namespace consts {
 		const float GRAVITY = 0.05f;
-		const float IMPULS_TRANSMITION_COEFFICIENT = 1.0f;
-		const float PRESSURE_FORCE_COEFFICIENT = 1.0f;
+		const float IMPULS_TRANSMITION_COEFFICIENT = 0.1f;
+		const float PRESSURE_FORCE_COEFFICIENT = 0.1f;
 	};
 
 	enum BlockType {

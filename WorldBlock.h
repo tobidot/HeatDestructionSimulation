@@ -51,23 +51,28 @@ public:
 private:
 	Impuls get_updated_impuls(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
-		auto effective_mass = block.pressure * block.mass;
-		auto gravity_impuls = Impuls(0.0f, effective_mass * gameplay::consts::GRAVITY);
+		if (get_effective_mass() <= 0) return Impuls(0, 0);
+		auto gravity_impuls = Impuls(0.0f, get_effective_mass() * gameplay::consts::GRAVITY);
 
 		auto horizontal_pressure_diff = neighbours.get_right().pressure - neighbours.get_left().pressure;
 		auto vertical_pressure_diff = neighbours.get_bottom().pressure - neighbours.get_top().pressure;
 		auto pressure_impuls = Impuls(
-			horizontal_pressure_diff * gameplay::consts::PRESSURE_FORCE_COEFFICIENT, 
+			horizontal_pressure_diff * gameplay::consts::PRESSURE_FORCE_COEFFICIENT,
 			vertical_pressure_diff * gameplay::consts::PRESSURE_FORCE_COEFFICIENT
 		);
 
-		auto impuls_from_top = std::max(neighbours.get_top().impuls.get_y() * neighbours.get_top().get_effective_mass(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
-		auto impuls_from_bottom = std::min(neighbours.get_bottom().impuls.get_y(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
-		auto impuls_from_left = std::max(neighbours.get_left().impuls.get_x(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
-		auto impuls_from_right = std::min(neighbours.get_right().impuls.get_x(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
-		auto neighbour_impuls = Impuls(impuls_from_top + impuls_from_bottom, impuls_from_left + impuls_from_right);
+		auto impuls_from_top___ = neighbours.get_top().impuls.get_y() * neighbours.get_top().get_effective_mass() ;
+		auto impuls_from_bottom = neighbours.get_bottom().impuls.get_y() * neighbours.get_bottom().get_effective_mass();
+		auto impuls_from_left__ = neighbours.get_left().impuls.get_x() * neighbours.get_left().get_effective_mass();
+		auto impuls_from_right_ = neighbours.get_right().impuls.get_x() * neighbours.get_right().get_effective_mass();
+		if (impuls_from_top___ < 0) impuls_from_top___ = 0.0f;
+		if (impuls_from_bottom > 0) impuls_from_bottom = 0.0f;
+		if (impuls_from_left__ < 0) impuls_from_left__ = 0.0f;
+		if (impuls_from_right_ > 0) impuls_from_right_ = 0.0f;
+		float impuls_transmition_effectiveness = gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
+		auto neighbour_impuls = Impuls(impuls_from_left__ + impuls_from_right_ ,impuls_from_top___ + impuls_from_bottom ) * impuls_transmition_effectiveness;
 
-		return block.impuls + gravity_impuls + pressure_impuls + neighbour_impuls;
+		return block.impuls + (gravity_impuls + pressure_impuls + neighbour_impuls) / get_effective_mass();
 	}
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
