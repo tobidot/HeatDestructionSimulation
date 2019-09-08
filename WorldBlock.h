@@ -43,10 +43,17 @@ public:
 		return this->type == type;
 	}
 
-	bool is_out_of_map() {
-		return position.get_y() < 0 || position.get_x() < 0;
+	bool is_immovable_block() const {
+		return type == gameplay::BlockType::HEAVEN_STONE || type == gameplay::BlockType::HELL_STONE;
 	}
 
+	void set_to(const WorldBlock& other) {
+		impuls = other.impuls;
+		type = other.type;
+		pressure = other.pressure;
+		mass = other.mass;
+		heat = other.heat;
+	}
 
 private:
 	Impuls get_updated_impuls(const DirectNeighbours& neighbours) const {
@@ -87,6 +94,7 @@ private:
 		float heat_result = Heat(medium_heat * heat_cooeficient + block.heat * (1 - heat_cooeficient));
 		return heat_result;
 	}
+
 
 public:
 	static WorldBlock create_block(const Position& pos, const Impuls& impulse, gameplay::BlockType type, Pressure pressure, Heat heat) {
