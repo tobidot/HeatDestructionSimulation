@@ -20,6 +20,7 @@ private:
 	float time_to_next_update;
 	olc::Sprite* human_stand;
 	World world = World(50u, 50u);
+	Position camera = Position(25,25);
 
 public:
 	GameEngine()
@@ -57,6 +58,7 @@ public:
 			time_to_next_update = 0.125;
 		}
 
+		update_camera_input();
 
 		for (auto world_block : world) {
 			auto x = world_block.position.get_x();
@@ -70,6 +72,21 @@ public:
 
 		return true;
 
+	}
+
+	void update_camera_input() {
+		if (this->GetKey(olc::Key::LEFT).bHeld) {
+			camera = camera.left();
+		}
+		if (this->GetKey(olc::Key::RIGHT).bHeld) {
+			camera = camera.right();
+		}
+		if (this->GetKey(olc::Key::UP).bHeld) {
+			camera = camera.up();
+		}
+		if (this->GetKey(olc::Key::DOWN).bHeld) {
+			camera = camera.down();
+		}
 	}
 
 	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block) {
