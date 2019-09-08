@@ -97,7 +97,7 @@ public:
 	}
 
 	static inline WorldBlock create_random_block(const Position& pos) {
-		gameplay::BlockType type = gameplay::BlockType(rand() % gameplay::BlockType::MAX);
+		gameplay::BlockType type = gameplay::get_random_block_type();
 		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, rand() % 10, Heat(rand() % 100));
 	}
 };

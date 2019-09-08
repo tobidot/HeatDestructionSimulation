@@ -23,6 +23,7 @@ namespace gameplay {
 
 	Mass get_mass_of_block_type(BlockType type);
 	olc::Pixel get_color_of_block_type(BlockType type);
+	BlockType get_random_block_type();
 
 
 };

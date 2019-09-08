@@ -35,4 +35,10 @@ namespace gameplay {
 			return 1;
 		}
 	}
+
+	BlockType get_random_block_type() {
+		const BlockType possible_types[] = { VACUUM, DIRT, AIR };
+		const size_t count_possiblities = sizeof(possible_types) / sizeof(BlockType);
+		return possible_types[rand() % count_possiblities];
+	}
 }
