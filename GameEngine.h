@@ -86,9 +86,10 @@ public:
 			return olc::Pixel(value, value / 8, value / 8);
 		}
 		else if (this->GetKey(olc::Key::I).bHeld) {
+			if (abs(block.impuls.get_x()) < 0.001 && abs(block.impuls.get_y() < 0.001)) return olc::Pixel(0,0,0);
 			MyVector<float> normalized_impuls = block.impuls.get_normalized();
-			uint8_t value_r = uint8_t(std::min(128 + uint8_t(127.0f * normalized_impuls.get_x()), 255));
-			uint8_t value_b = uint8_t(std::min(128 + uint8_t(127.0f * normalized_impuls.get_y()), 255));
+			uint8_t value_r = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_x()), 255));
+			uint8_t value_b = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_y()), 255));
 			return olc::Pixel(value_r, 0, value_b);
 		}
 		return get_color_of_block_type(block.type);
