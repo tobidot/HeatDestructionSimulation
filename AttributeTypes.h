@@ -5,6 +5,6 @@
 using Impuls = MyVector<float>;
 using Position = MyVector<int16_t>;
 
-using Pressure = int16_t;
-using Mass = int16_t;
+using Pressure = int64_t;
+using Mass = int64_t;
 using Heat = float;
