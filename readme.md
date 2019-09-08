@@ -1,4 +1,18 @@
+
 ## Simulation
+
+### Controls
+
+Currently you can only switch the render modes.
+
+| Key | Action |
+|:-:|:-:|
+| I | Visualizes the impulses |
+| H | Visualizes the heatmap |
+| M | Visualizes the masses |
+| P | Visualizes the pressure |
+
+
 
 ### The World
 
@@ -23,17 +37,11 @@ If two neighbouring blocks merge together their pressure value adds up.
 A block always tries to minimize its pressure value as much as possible.
 This is achived by adding an impuls towards a block with a lower pressure.
 
-
 #### Mass
-The mass is a value defined by 
-> base_mass * pressure
+This is the basemass of a single block without pressure.
 
 This mass acts upon a block simply multipling the gravity with its mass.
-> gravity_impuls = {0, mass * consts::gravity }
-
-#### Type
-Type defines some extra behaviours when beeig next to other blocks.
-Will be polished and defined later.
+> gravity_impuls = {0, mass * pressure * consts::gravity }
 
 #### Heat
 This attribute is the only thing the user can manipulate.
@@ -45,10 +53,44 @@ This value mostly determines wether something happens or not.
 If this value is bigger than a certain threshold,
 the blocks values will copy towards the targets block and the target block moves to this block.
 
+#### Type
+Type defines some extra behaviours when beeig next to other blocks.
+Will be polished and defined later.
+
+
+### World Bounds
+The world is simulated in a relatively small box.  
+*Currently 50x50*  
+In the horizontal axis the world is repeating.
+So what gets out to the right, comes in from the far left.
+But in the verticals the world has set boundries defined by its height.
+These boundries exist of never changeing blocks.
+They keep the same impuls, pressure, heat , etc., no matter the influence.
+They even have their special block types.
+At the bottom HELLSTONE has fixed values of
+
+| TYPE | Mass | Pressure | Heat | Impuls |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| HELLSTONE | 100 | 1 | 100000 | (0,0) |
+
+Above the top of the world HEAVENSTONE exists.
+
+| TYPE | Mass | Pressure | Heat | Impuls |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| HEAVENSTONE | 0 | 0 | 0 | (0,0) |
+
+
+### Movements
+
+In pr0gress
+
+
 
 ## Example
 
-##### Pressure Map
+~Too much will change here so example is not in sync with the code~
+
+##### Map
 
 | | | |
 |---|---|:-:|
@@ -56,32 +98,10 @@ the blocks values will copy towards the targets block and the target block moves
 | 0m 0p (0,0)i | 0m 0p (0,0)i | 0m 0p (0,0)i |
 | 1m 1p (0,0)i | 0m 0p (0,0)i | 0m 0p (0,0)i |
 
-###### Thoughts
 
-World boundries
 
-Impuls 
-000
-?x?
-000
 
-Mass 
-000
-?x?
-nnn
-
-#### World boundries
-
-At the borders of the world some unchanging blocks are placed.
-Since the world is repeating in horizontal direction,
-they are only necessary above and below the world.
-
-| |
-|---|
-| 0m 0p (0,0)i | 
-| World | 
-| 1m 1p (0,0)i | 
-
+## Thoughts and Upcumming Features
 
 ### Step 1
 
