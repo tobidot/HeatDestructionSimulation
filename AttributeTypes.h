@@ -20,6 +20,11 @@ public:
 	const SELF right(T amount = 1) const { return SELF(get_x() + amount, get_y()); }
 	const SELF top(T amount = 1) const { return SELF(get_x(), get_y() - amount); }
 	const SELF bottom(T amount = 1) const { return SELF(get_x(), get_y() + amount); }
+	const SELF get_snapped_to_up_down_left_right() const {
+		auto is_horizontal = (abs(get_x()) > abs(get_y));
+		if (is_horizontal) return (get_x() > 0) ? RIGHT : LEFT;
+		else return (get_y() > 0) ? BOTTOM : TOP;
+	}
 
 	template<typename R = T>
 	R get_length2() const { return get_x() * get_x() + get_y() * get_y(); }
@@ -33,6 +38,12 @@ public:
 	SELF operator-(const SELF& other) const { return SELF(get_x() - other.get_x(), get_y() - other.get_y()); }
 	SELF operator*(const T mul) const { return SELF(get_x() * mul, get_y() * mul); }
 	SELF operator/(const T div) const { return SELF(get_x() / div, get_y() / div); }
+
+public:
+	static const SELF UP = SELF(T(0), T(-1));
+	static const SELF DOWN = SELF(T(0), T(1));
+	static const SELF LEFT = SELF(T(-1), T(0));
+	static const SELF RIGHT = SELF(T(1), T(0));
 
 };
 
