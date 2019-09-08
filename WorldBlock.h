@@ -28,7 +28,7 @@ public:
 		this->impuls = impuls;
 		this->mass = get_mass_of_block_type(type);
 	}
-	WorldBlock get_update_result(const DirectNeighbours& neighbours) {
+	WorldBlock get_update_result(const DirectNeighbours& neighbours) const {
 		WorldBlock block = *this;
 		block.heat = get_updated_heat(neighbours);
 		block.impuls = get_updated_impuls(neighbours);
@@ -72,8 +72,9 @@ private:
 		float impuls_transmition_effectiveness = gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
 		auto neighbour_impuls = Impuls(impuls_from_left__ + impuls_from_right_ ,impuls_from_top___ + impuls_from_bottom ) * impuls_transmition_effectiveness;
 
-		return block.impuls + (gravity_impuls + pressure_impuls + neighbour_impuls) / get_effective_mass();
+		return block.impuls + (gravity_impuls + pressure_impuls + neighbour_impuls) / float(get_effective_mass());
 	}
+
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
 		auto extract_heat_from_block = [](const WorldBlock* block) {return block->heat; };
