@@ -18,8 +18,10 @@ class GameEngine :
 private:
 	float game_time;
 	float time_to_next_update;
+	float time_to_next_camera_update;
 	olc::Sprite* human_stand;
 	World world = World(50u, 50u);
+	Position camera = Position(25, 25);
 
 public:
 	GameEngine()
@@ -50,26 +52,50 @@ public:
 	{
 		game_time += fElapsedTime;
 		time_to_next_update -= fElapsedTime;
+		time_to_next_camera_update -= fElapsedTime;
 		// called once per frame
 
 		if (time_to_next_update < 0) {
 			world = world.update();
 			time_to_next_update = 0.125;
 		}
-
-
-		for (auto world_block : world) {
-			auto x = world_block.position.get_x();
-			auto y = world_block.position.get_y();
-			olc::Pixel color = this->get_pixel_for_block_in_render_mode(world_block);
-			Draw(x, y, color);
+		if (time_to_next_camera_update < 0) {
+			update_camera_input();
+			time_to_next_camera_update = 0.015625;
 		}
 
 
-		//DrawSprite(5, 5, human_stand, 2);
+		for (int16_t x = 0; x < this->GetDrawTargetWidth(); ++x) {
+			for (int16_t y = 0; y < this->GetDrawTargetHeight(); ++y) {
+				auto world_x = x + camera.get_x() - world.WIDTH / 2;
+				auto world_y = y + camera.get_y() - world.HEIGHT / 2;
+				auto block = world.at(Position(world_x, world_y));
+				olc::Pixel color = this->get_pixel_for_block_in_render_mode(block);
+				Draw(x, y, color);
+			}
+		}
 
 		return true;
 
+	}
+
+	void update_camera_input() {
+		if (this->GetKey(olc::Key::LEFT).bHeld) {
+			camera = camera.left();
+			if (camera.get_x() < 0) camera.set_x(world.WIDTH-1);
+		}
+		if (this->GetKey(olc::Key::RIGHT).bHeld) {
+			camera = camera.right();
+			if (camera.get_x() >= world.WIDTH) camera.set_x(0);
+		}
+		if (this->GetKey(olc::Key::UP).bHeld) {
+			camera = camera.up();
+			if (camera.get_y() < 0) camera.set_y(0);
+		}
+		if (this->GetKey(olc::Key::DOWN).bHeld) {
+			camera = camera.down();
+			if (camera.get_y() > world.HEIGHT) camera.set_y(world.HEIGHT);
+		}
 	}
 
 	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block) {
@@ -86,7 +112,7 @@ public:
 			return olc::Pixel(value, value / 8, value / 8);
 		}
 		else if (this->GetKey(olc::Key::I).bHeld) {
-			if (abs(block.impuls.get_x()) < 0.001 && abs(block.impuls.get_y() < 0.001)) return olc::Pixel(0,0,0);
+			if (abs(block.impuls.get_x()) < 0.001 && abs(block.impuls.get_y() < 0.001)) return olc::Pixel(0, 0, 0);
 			MyVector<float> normalized_impuls = block.impuls.get_normalized();
 			uint8_t value_r = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_x()), 255));
 			uint8_t value_b = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_y()), 255));

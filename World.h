@@ -72,7 +72,7 @@ public:
 	}
 
 	DirectNeighbours neighbours_at(const Position pos) const {
-		return DirectNeighbours({ &at(pos.left()) , &at(pos.right()) , &at(pos.top()) , &at(pos.bottom()) });
+		return DirectNeighbours({ &at(pos.left()) , &at(pos.right()) , &at(pos.up()) , &at(pos.down()) });
 	}
 
 	World update() const {

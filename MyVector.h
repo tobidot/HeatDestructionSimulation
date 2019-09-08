@@ -19,8 +19,8 @@ public:
 	inline SELF& set_y(T y) { this->second = y; return *this; }
 	const SELF left(T amount = 1) const { return SELF(get_x() - amount, get_y()); }
 	const SELF right(T amount = 1) const { return SELF(get_x() + amount, get_y()); }
-	const SELF top(T amount = 1) const { return SELF(get_x(), get_y() - amount); }
-	const SELF bottom(T amount = 1) const { return SELF(get_x(), get_y() + amount); }
+	const SELF up(T amount = 1) const { return SELF(get_x(), get_y() - amount); }
+	const SELF down(T amount = 1) const { return SELF(get_x(), get_y() + amount); }
 	const SELF get_snapped_to_up_down_left_right() const {
 		auto is_horizontal = (abs(get_x()) > abs(get_y));
 		if (is_horizontal) return (get_x() > 0) ? SELF::RIGHT : SELF::LEFT;
