@@ -1,10 +1,12 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <array>
 #include <vector>
 #include <algorithm>
 #include "olcPixelGameEngine.h"
 #include "Gameplay.h"
 #include "World.h"
+#include <math.h>
 
 using namespace gameplay;
 
@@ -72,7 +74,7 @@ public:
 
 	olc::Pixel get_pixel_for_block_in_render_mode(WorldBlock block) {
 		if (this->GetKey(olc::Key::P).bHeld) {
-			uint8_t value = uint8_t(std::min(long(block.pressure), 255l));
+			uint8_t value = uint8_t(std::min(long(block.pressure * 16), 255l));
 			return olc::Pixel(value / 8, value / 8, value);
 		}
 		else if (this->GetKey(olc::Key::M).bHeld) {
@@ -84,8 +86,10 @@ public:
 			return olc::Pixel(value, value / 8, value / 8);
 		}
 		else if (this->GetKey(olc::Key::I).bHeld) {
-			uint8_t value_r = uint8_t(std::min(long(block.impuls.get_x()), 255l));
-			uint8_t value_b = uint8_t(std::min(long(block.impuls.get_y()), 255l));
+			if (abs(block.impuls.get_x()) < 0.001 && abs(block.impuls.get_y() < 0.001)) return olc::Pixel(0,0,0);
+			MyVector<float> normalized_impuls = block.impuls.get_normalized();
+			uint8_t value_r = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_x()), 255));
+			uint8_t value_b = uint8_t(std::min(128 + int8_t(127.0f * normalized_impuls.get_y()), 255));
 			return olc::Pixel(value_r, 0, value_b);
 		}
 		return get_color_of_block_type(block.type);

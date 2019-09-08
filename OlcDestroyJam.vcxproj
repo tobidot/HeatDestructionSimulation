@@ -126,12 +126,14 @@
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="Gameplay.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttributeTypes.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="Gameplay.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="MyVector.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldBlock.h" />
