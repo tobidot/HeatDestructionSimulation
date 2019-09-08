@@ -32,6 +32,7 @@ public:
 		WorldBlock block = *this;
 		block.heat = get_updated_heat(neighbours);
 		block.impuls = get_updated_impuls(neighbours);
+		block.pressure = 1 + block.heat / 50;
 		return block;
 	}
 
@@ -88,11 +89,11 @@ private:
 		auto extract_heat_from_block = [](const WorldBlock* block) {return block->heat; };
 		auto heat_accumulator = [](Heat acc, const WorldBlock* block) {return acc + block->heat; };
 		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), Heat(0), heat_accumulator);
-		auto medium_heat = (sum_heat + block.heat) / 5;
+		auto medium_heat = (sum_heat ) / 4;
 		auto heat_diff = (atanf(medium_heat - block.heat) + 1.0f) / 2.0f;
 
 		float heat_cooeficient = heat_diff * heat_diff / (block.mass + 1.0f);
-		float heat_result = Heat(medium_heat * heat_cooeficient + block.heat * (1 - heat_cooeficient));
+		float heat_result = std::max(Heat(medium_heat * heat_cooeficient + block.heat * (1 - heat_cooeficient)) * .9f, 0.0f);
 		return heat_result;
 	}
 

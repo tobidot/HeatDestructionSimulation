@@ -24,7 +24,7 @@ public : /** DEBUG */
 	std::vector<WorldBlockProbabilityVector> movement_possiblity_map;
 private:
 	WorldBlock block_above_world_top = WorldBlock::create_block({ 0,-1 }, { 0.0f,0.0f }, gameplay::BlockType::HEAVEN_STONE, 0, 0);
-	WorldBlock block_below_world_bottom = WorldBlock::create_block({ 0,(int16_t)HEIGHT }, { 0.0f,0.0f }, gameplay::BlockType::HELL_STONE, 10, 100000.0f);
+	WorldBlock block_below_world_bottom = WorldBlock::create_block({ 0,(int16_t)HEIGHT }, { 0.0f,0.0f }, gameplay::BlockType::HELL_STONE, 10, 1000.0f);
 
 public:
 	World(const World& cpy) :
@@ -130,8 +130,7 @@ public:
 						auto& source_block = result.blocks.at(target_block_id);
 						auto& target_block = result.blocks.at(source_block_id);
 
-						// swapp blocks
-						
+						// swapp blocks						
 						WorldBlock swap_buffer = target_block;
 						target_block.set_to( source_block );
 						source_block.set_to( swap_buffer );

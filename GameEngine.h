@@ -75,6 +75,13 @@ public:
 			}
 		}
 
+		if (GetMouse(0).bHeld) {
+			auto &block = world.at(Position(GetMouseX(), GetMouseY()));
+			if (block.is_immovable_block() == false) {
+				block.heat += 1000.0f;
+			}
+		}
+
 		return true;
 
 	}
