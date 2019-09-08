@@ -47,12 +47,13 @@ public:
 		return type == gameplay::BlockType::HEAVEN_STONE || type == gameplay::BlockType::HELL_STONE;
 	}
 
-	void set_to(const WorldBlock& other) {
+	WorldBlock &set_to(const WorldBlock& other) {
 		impuls = other.impuls;
 		type = other.type;
 		pressure = other.pressure;
 		mass = other.mass;
 		heat = other.heat;
+		return *this;
 	}
 
 private:
@@ -107,7 +108,7 @@ public:
 
 	static inline WorldBlock create_random_block(const Position& pos) {
 		gameplay::BlockType type = gameplay::get_random_block_type();
-		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, rand() % 10, Heat(rand() % 100));
+		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, 1, Heat(rand() % 100));
 	}
 };
 

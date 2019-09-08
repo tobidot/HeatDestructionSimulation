@@ -127,9 +127,22 @@ public:
 					// not the same block
 					if (moved_blocks.find(source_block_id) == moved_blocks.end()) {
 						// not yet moved source
-						auto swap_buffer = result.blocks.at(target_block_id);
-						result.blocks.at(target_block_id).set_to( result.blocks.at(source_block_id) );
-						result.blocks.at(source_block_id).set_to( swap_buffer );
+						auto& source_block = result.blocks.at(target_block_id);
+						auto& target_block = result.blocks.at(source_block_id);
+
+						// swapp blocks
+						
+						WorldBlock swap_buffer = target_block;
+						target_block.set_to( source_block );
+						source_block.set_to( swap_buffer );
+						
+						// reduce impulses
+						auto direction = (target_block.position - source_block.position).get_as_type<float>();
+						auto force_needed = (target_block.get_effective_mass() + source_block.get_effective_mass()) * 100.0f;
+						source_block.impuls = source_block.impuls - direction * force_needed;
+						target_block.impuls = target_block.impuls + direction * force_needed;
+
+						// mark as moved
 						moved_blocks.emplace(source_block_id, true);
 						moved_blocks.emplace(target_block_id, true);
 					}
@@ -147,12 +160,13 @@ public:
 private:
 	WorldBlockProbabilityVector get_movement_possibilities(const WorldBlock& block, const DirectNeighbours& neighbours) const {
 		auto block_id = get_block_id(block);
+		auto force_needed = (block.get_effective_mass() + block.get_effective_mass()) * 100.0f + 1.0f;
 		WorldBlockProbabilityVector buffer(block_id, 0);
-		WorldBlockProbability center_block_probabilty_pair = std::make_pair(&block, 10000.0f / block.impuls.get_length2() );
-		WorldBlockProbability top_block_probabilty_pair = std::make_pair(&neighbours.get_top(), 0.7f);
-		WorldBlockProbability bottom_block_probabilty_pair = std::make_pair(&neighbours.get_bottom(), 0.7f);
-		WorldBlockProbability left_block_probabilty_pair = std::make_pair(&neighbours.get_left(), 0.7f);
-		WorldBlockProbability right_block_probabilty_pair = std::make_pair(&neighbours.get_right(), 0.7f);
+		WorldBlockProbability center_block_probabilty_pair = std::make_pair(&block, 1.0f - std::min(block.impuls.get_length2() / force_needed, 1.0f) );
+		WorldBlockProbability top_block_probabilty_pair = std::make_pair(&neighbours.get_top(), get_probability_block_moves_to_position(neighbours.get_top(), block));
+		WorldBlockProbability bottom_block_probabilty_pair = std::make_pair(&neighbours.get_bottom(), get_probability_block_moves_to_position(neighbours.get_bottom(), block));
+		WorldBlockProbability left_block_probabilty_pair = std::make_pair(&neighbours.get_left(), get_probability_block_moves_to_position(neighbours.get_left(), block));
+		WorldBlockProbability right_block_probabilty_pair = std::make_pair(&neighbours.get_right(), get_probability_block_moves_to_position(neighbours.get_right(), block));
 
 		buffer.second.emplace_back(center_block_probabilty_pair);
 		if (neighbours.get_top().is_immovable_block() == false) buffer.second.emplace_back(top_block_probabilty_pair);
@@ -160,9 +174,18 @@ private:
 		if (neighbours.get_left().is_immovable_block() == false) buffer.second.emplace_back(left_block_probabilty_pair);
 		if (neighbours.get_right().is_immovable_block() == false) buffer.second.emplace_back(right_block_probabilty_pair);
 		std::sort(buffer.second.begin(), buffer.second.end(), [](const WorldBlockProbability &a, const WorldBlockProbability &b)->bool {
-			return a.first > b.first;
+			return a.second > b.second;
 			});
 		return buffer;
+	}
+
+	float get_probability_block_moves_to_position( const WorldBlock &source_block, const WorldBlock &target_block)const {
+		auto force_needed = (target_block.get_effective_mass() + source_block.get_effective_mass()) * 100.0f;
+		if (force_needed <= 0.0f) return 0.0f;
+		auto direction = (target_block.position - source_block.position).get_normalized().get_as_type<float>();
+		float impuls_in_direction = direction.get_scalar_product(source_block.impuls-target_block.impuls);
+		float result = float( 0.5f + atanf(impuls_in_direction / force_needed) / M_PI);
+		return result;
 	}
 
 	inline uint16_t get_block_id(const WorldBlock& block) const {
