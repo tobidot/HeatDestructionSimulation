@@ -28,10 +28,11 @@ public:
 		this->impuls = impuls;
 		this->mass = get_mass_of_block_type(type);
 	}
-	WorldBlock get_update_result(const DirectNeighbours& neighbours) {
+	WorldBlock get_update_result(const DirectNeighbours& neighbours) const {
 		WorldBlock block = *this;
 		block.heat = get_updated_heat(neighbours);
 		block.impuls = get_updated_impuls(neighbours);
+		block.pressure = 1 + block.heat / 50;
 		return block;
 	}
 
@@ -43,10 +44,18 @@ public:
 		return this->type == type;
 	}
 
-	bool is_out_of_map() {
-		return position.get_y() < 0 || position.get_x() < 0;
+	bool is_immovable_block() const {
+		return type == gameplay::BlockType::HEAVEN_STONE || type == gameplay::BlockType::HELL_STONE;
 	}
 
+	WorldBlock &set_to(const WorldBlock& other) {
+		impuls = other.impuls;
+		type = other.type;
+		pressure = other.pressure;
+		mass = other.mass;
+		heat = other.heat;
+		return *this;
+	}
 
 private:
 	Impuls get_updated_impuls(const DirectNeighbours& neighbours) const {
@@ -72,20 +81,22 @@ private:
 		float impuls_transmition_effectiveness = gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
 		auto neighbour_impuls = Impuls(impuls_from_left__ + impuls_from_right_ ,impuls_from_top___ + impuls_from_bottom ) * impuls_transmition_effectiveness;
 
-		return block.impuls + (gravity_impuls + pressure_impuls + neighbour_impuls) / get_effective_mass();
+		return block.impuls + (gravity_impuls + pressure_impuls + neighbour_impuls) / float(get_effective_mass());
 	}
+
 	Heat get_updated_heat(const DirectNeighbours& neighbours) const {
 		const WorldBlock& block = *this;
 		auto extract_heat_from_block = [](const WorldBlock* block) {return block->heat; };
 		auto heat_accumulator = [](Heat acc, const WorldBlock* block) {return acc + block->heat; };
 		auto sum_heat = std::accumulate(neighbours.begin(), neighbours.end(), Heat(0), heat_accumulator);
-		auto medium_heat = (sum_heat + block.heat) / 5;
+		auto medium_heat = (sum_heat ) / 4;
 		auto heat_diff = (atanf(medium_heat - block.heat) + 1.0f) / 2.0f;
 
 		float heat_cooeficient = heat_diff * heat_diff / (block.mass + 1.0f);
-		float heat_result = Heat(medium_heat * heat_cooeficient + block.heat * (1 - heat_cooeficient));
+		float heat_result = std::max(Heat(medium_heat * heat_cooeficient + block.heat * (1 - heat_cooeficient)) * .9f, 0.0f);
 		return heat_result;
 	}
+
 
 public:
 	static WorldBlock create_block(const Position& pos, const Impuls& impulse, gameplay::BlockType type, Pressure pressure, Heat heat) {
@@ -98,7 +109,7 @@ public:
 
 	static inline WorldBlock create_random_block(const Position& pos) {
 		gameplay::BlockType type = gameplay::get_random_block_type();
-		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, rand() % 10, Heat(rand() % 100));
+		return WorldBlock::create_block(pos, { 0.0f,0.0f }, type, 1, Heat(rand() % 100));
 	}
 };
 

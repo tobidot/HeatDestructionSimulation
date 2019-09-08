@@ -75,6 +75,13 @@ public:
 			}
 		}
 
+		if (GetMouse(0).bHeld) {
+			auto &block = world.at(Position(GetMouseX(), GetMouseY()));
+			if (block.is_immovable_block() == false) {
+				block.heat += 1000.0f;
+			}
+		}
+
 		return true;
 
 	}
@@ -106,6 +113,12 @@ public:
 		else if (this->GetKey(olc::Key::M).bHeld) {
 			uint8_t value = uint8_t(std::min(long(block.mass), 255l));
 			return olc::Pixel(value / 8, value, value / 8);
+		}
+		else if (this->GetKey(olc::Key::W).bHeld) {
+			/*auto index = block.position.get_x() + block.position.get_y() * world.WIDTH;
+
+			uint8_t value = uint8_t(std::min(long(block.mass), 255l));
+			return olc::Pixel(value / 8, value, value / 8);*/
 		}
 		else if (this->GetKey(olc::Key::H).bHeld) {
 			uint8_t value = uint8_t(std::min(long(block.heat), 255l));
