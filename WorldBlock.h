@@ -35,6 +35,10 @@ public:
 		return block;
 	}
 
+	Mass get_effective_mass() const {
+		return mass * pressure;
+	}
+
 	bool is_of_type(gameplay::BlockType type) {
 		return this->type == type;
 	}
@@ -52,12 +56,15 @@ private:
 
 		auto horizontal_pressure_diff = neighbours.get_right().pressure - neighbours.get_left().pressure;
 		auto vertical_pressure_diff = neighbours.get_bottom().pressure - neighbours.get_top().pressure;
-		auto pressure_impuls = Impuls(horizontal_pressure_diff / 1.0f, vertical_pressure_diff / 1.0f);
+		auto pressure_impuls = Impuls(
+			horizontal_pressure_diff * gameplay::consts::PRESSURE_FORCE_COEFFICIENT, 
+			vertical_pressure_diff * gameplay::consts::PRESSURE_FORCE_COEFFICIENT
+		);
 
-		auto impuls_from_top = std::max(neighbours.get_top().impuls.get_y(), 0.0f) / 10.f;
-		auto impuls_from_bottom = std::min(neighbours.get_bottom().impuls.get_y(), 0.0f) / 10.f;
-		auto impuls_from_left = std::max(neighbours.get_left().impuls.get_x(), 0.0f) / 10.f;
-		auto impuls_from_right = std::min(neighbours.get_right().impuls.get_x(), 0.0f) / 10.f;
+		auto impuls_from_top = std::max(neighbours.get_top().impuls.get_y() * neighbours.get_top().get_effective_mass(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
+		auto impuls_from_bottom = std::min(neighbours.get_bottom().impuls.get_y(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
+		auto impuls_from_left = std::max(neighbours.get_left().impuls.get_x(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
+		auto impuls_from_right = std::min(neighbours.get_right().impuls.get_x(), 0.0f) * gameplay::consts::IMPULS_TRANSMITION_COEFFICIENT;
 		auto neighbour_impuls = Impuls(impuls_from_top + impuls_from_bottom, impuls_from_left + impuls_from_right);
 
 		return block.impuls + gravity_impuls + pressure_impuls + neighbour_impuls;
